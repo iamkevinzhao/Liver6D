@@ -1,34 +1,20 @@
 #include "pclviewer.h"
 #include "ui_pclviewer.h"
+#include <QDir>
+#include <QDebug>
+#include <QTimer>
+#include <frame.h>
+
+const QString kMediaFolder = "media";
+const QString kPlayButtonPlay = "Play";
+const QString kPlayButtonStop = "Stop";
 
 PCLViewer::PCLViewer (QWidget *parent) :
   QMainWindow (parent),
   ui (new Ui::PCLViewer)
 {
   ui->setupUi (this);
-  this->setWindowTitle ("PCL viewer");
-
-  // Setup the cloud pointer
-  cloud.reset (new PointCloudT);
-  // The number of points in the cloud
-  cloud->points.resize (200);
-
-  // The default color
-  red   = 128;
-  green = 128;
-  blue  = 128;
-
-  // Fill the cloud with some points
-  for (size_t i = 0; i < cloud->points.size (); ++i)
-  {
-    cloud->points[i].x = 1024 * rand () / (RAND_MAX + 1.0f);
-    cloud->points[i].y = 1024 * rand () / (RAND_MAX + 1.0f);
-    cloud->points[i].z = 1024 * rand () / (RAND_MAX + 1.0f);
-
-    cloud->points[i].r = red;
-    cloud->points[i].g = green;
-    cloud->points[i].b = blue;
-  }
+  this->setWindowTitle ("Liver6D");
 
   // Set up the QVTK window
   viewer.reset (new pcl::visualization::PCLVisualizer ("viewer", false));
@@ -36,86 +22,69 @@ PCLViewer::PCLViewer (QWidget *parent) :
   viewer->setupInteractor (ui->qvtkWidget->GetInteractor (), ui->qvtkWidget->GetRenderWindow ());
   ui->qvtkWidget->update ();
 
-  // Connect "random" button and the function
-  connect (ui->pushButton_random,  SIGNAL (clicked ()), this, SLOT (randomButtonPressed ()));
-
-  // Connect R,G,B sliders and their functions
-  connect (ui->horizontalSlider_R, SIGNAL (valueChanged (int)), this, SLOT (redSliderValueChanged (int)));
-  connect (ui->horizontalSlider_G, SIGNAL (valueChanged (int)), this, SLOT (greenSliderValueChanged (int)));
-  connect (ui->horizontalSlider_B, SIGNAL (valueChanged (int)), this, SLOT (blueSliderValueChanged (int)));
-  connect (ui->horizontalSlider_R, SIGNAL (sliderReleased ()), this, SLOT (RGBsliderReleased ()));
-  connect (ui->horizontalSlider_G, SIGNAL (sliderReleased ()), this, SLOT (RGBsliderReleased ()));
-  connect (ui->horizontalSlider_B, SIGNAL (sliderReleased ()), this, SLOT (RGBsliderReleased ()));
-
-  // Connect point size slider
-  connect (ui->horizontalSlider_p, SIGNAL (valueChanged (int)), this, SLOT (pSliderValueChanged (int)));
-
-  viewer->addPointCloud (cloud, "cloud");
-  pSliderValueChanged (2);
-  viewer->resetCamera ();
-  ui->qvtkWidget->update ();
-}
-
-void
-PCLViewer::randomButtonPressed ()
-{
-  printf ("Random button was pressed\n");
-
-  // Set the new color
-  for (size_t i = 0; i < cloud->size(); i++)
-  {
-    cloud->points[i].r = 255 *(1024 * rand () / (RAND_MAX + 1.0f));
-    cloud->points[i].g = 255 *(1024 * rand () / (RAND_MAX + 1.0f));
-    cloud->points[i].b = 255 *(1024 * rand () / (RAND_MAX + 1.0f));
+  if (gFrames.empty()) {
+    QDir directory(kMediaFolder);
+    QStringList images = directory.entryList(QDir::Files);
+    gFrames.reserve(images.size());
+    for (auto& name : images) {
+      Frame frame;
+      frame.image = std::move(QPixmap(kMediaFolder + "/" + name));
+      gFrames.emplace_back(std::move(frame));
+    }
   }
 
-  viewer->updatePointCloud (cloud, "cloud");
-  ui->qvtkWidget->update ();
+  ui->PlaySlider->setMinimum(0);
+  ui->PlaySlider->setMaximum(gFrames.size() - 1);
+  ui->PlaySlider->setValue(1);
+//  viewer->addPointCloud (cloud, "cloud");
+//  viewer->resetCamera ();
+//  ui->qvtkWidget->update ();
+
+  timer_id_ = startTimer(30);
 }
 
-void
-PCLViewer::RGBsliderReleased ()
-{
-  // Set the new color
-  for (size_t i = 0; i < cloud->size (); i++)
-  {
-    cloud->points[i].r = red;
-    cloud->points[i].g = green;
-    cloud->points[i].b = blue;
+void PCLViewer::timerEvent(QTimerEvent *event) {
+  if (event->timerId() != timer_id_) {
+    return;
   }
-  viewer->updatePointCloud (cloud, "cloud");
-  ui->qvtkWidget->update ();
-}
 
-void
-PCLViewer::pSliderValueChanged (int value)
-{
-  viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, value, "cloud");
-  ui->qvtkWidget->update ();
-}
-
-void
-PCLViewer::redSliderValueChanged (int value)
-{
-  red = value;
-  printf ("redSliderValueChanged: [%d|%d|%d]\n", red, green, blue);
-}
-
-void
-PCLViewer::greenSliderValueChanged (int value)
-{
-  green = value;
-  printf ("greenSliderValueChanged: [%d|%d|%d]\n", red, green, blue);
-}
-
-void
-PCLViewer::blueSliderValueChanged (int value)
-{
-  blue = value;
-  printf("blueSliderValueChanged: [%d|%d|%d]\n", red, green, blue);
+  if (ui->PlayButton->text() == kPlayButtonPlay) {
+    auto slider = ui->PlaySlider;
+    if (slider->value() < gFrames.size()) {
+      ui->ImageLabel->setPixmap(gFrames[slider->value()].image);
+      slider->setValue(slider->value() + 1);
+    }
+  }
 }
 
 PCLViewer::~PCLViewer ()
 {
   delete ui;
+}
+
+void PCLViewer::on_PlayButton_clicked()
+{
+  auto button = ui->PlayButton;
+  if (button->text() == kPlayButtonPlay) {
+    button->setText(kPlayButtonStop);
+  } else {
+    button->setText(kPlayButtonPlay);
+  }
+}
+
+void PCLViewer::on_PlaySlider_valueChanged(int value)
+{
+  ui->ImageLabel->setPixmap(gFrames[value].image);
+}
+
+void PCLViewer::on_GoButton_clicked()
+{
+  auto slider = ui->PlaySlider;
+  slider->setValue(slider->value() + 1);
+}
+
+void PCLViewer::on_BackButton_clicked()
+{
+  auto slider = ui->PlaySlider;
+  slider->setValue(slider->value() - 1);
 }

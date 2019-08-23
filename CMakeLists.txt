@@ -15,12 +15,14 @@ set(CMAKE_AUTOUIC ON)
 add_executable(
   liver6d
     main.cpp
-    main_window.cpp
-    main_window.h
-    main_window.ui
+#    main_window.cpp
+#    main_window.h
+#    main_window.ui
     pclviewer.cpp
     pclviewer.h
     pclviewer.ui
+    frame.cpp
+    frame.h
 )
 
 target_link_libraries(

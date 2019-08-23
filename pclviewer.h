@@ -29,34 +29,21 @@ public:
   explicit PCLViewer (QWidget *parent = 0);
   ~PCLViewer ();
 
-public Q_SLOTS:
-  void
-  randomButtonPressed ();
-
-  void
-  RGBsliderReleased ();
-
-  void
-  pSliderValueChanged (int value);
-
-  void
-  redSliderValueChanged (int value);
-
-  void
-  greenSliderValueChanged (int value);
-
-  void
-  blueSliderValueChanged (int value);
-
 protected:
-  pcl::visualization::PCLVisualizer::Ptr viewer;
-  PointCloudT::Ptr cloud;
+  void timerEvent(QTimerEvent* event);
 
-  unsigned int red;
-  unsigned int green;
-  unsigned int blue;
+  pcl::visualization::PCLVisualizer::Ptr viewer;
+
+private slots:
+  void on_PlayButton_clicked();
+
+  void on_PlaySlider_valueChanged(int value);
+
+  void on_GoButton_clicked();
+
+  void on_BackButton_clicked();
 
 private:
   Ui::PCLViewer *ui;
-
+  int timer_id_;
 };
