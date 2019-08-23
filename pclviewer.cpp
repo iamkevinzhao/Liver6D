@@ -8,6 +8,8 @@
 const QString kMediaFolder = "media";
 const QString kPlayButtonPlay = "Play";
 const QString kPlayButtonStop = "Stop";
+const QString kScanOnly = "Scan-Only Mode";
+const QString kFullVideo = "Full-Video Mode";
 
 PCLViewer::PCLViewer (QWidget *parent) :
   QMainWindow (parent),
@@ -54,9 +56,10 @@ void PCLViewer::timerEvent(QTimerEvent *event) {
 
   if (ui->PlayButton->text() == kPlayButtonPlay) {
     auto slider = ui->PlaySlider;
-    gFrames[slider->value()].Visualize();
+    gFrames[slider->value()].Visualize(ui->VideoModeButton->text() == kScanOnly);
     slider->setValue(slider->value() + 1);
   }
+
 
   ui->qvtkWidget->update();
 }
@@ -78,7 +81,7 @@ void PCLViewer::on_PlayButton_clicked()
 
 void PCLViewer::on_PlaySlider_valueChanged(int value)
 {
-  gFrames[ui->PlaySlider->value()].Visualize();
+  gFrames[ui->PlaySlider->value()].Visualize(ui->VideoModeButton->text() == kScanOnly);
 }
 
 void PCLViewer::on_GoButton_clicked()
@@ -93,4 +96,14 @@ void PCLViewer::on_BackButton_clicked()
   auto slider = ui->PlaySlider;
   slider->setValue(slider->value() - 1);
   ui->PlayButton->setText(kPlayButtonStop);
+}
+
+void PCLViewer::on_VideoModeButton_clicked()
+{
+  auto button = ui->VideoModeButton;
+  if (button->text() == kScanOnly) {
+    button->setText(kFullVideo);
+  } else {
+    button->setText(kScanOnly);
+  }
 }

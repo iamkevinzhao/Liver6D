@@ -43,6 +43,8 @@ private slots:
 
   void on_BackButton_clicked();
 
+  void on_VideoModeButton_clicked();
+
 private:
   Ui::PCLViewer *ui;
   int timer_id_;

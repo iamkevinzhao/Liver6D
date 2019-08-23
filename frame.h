@@ -23,7 +23,7 @@ public:
   pcl::visualization::PCLVisualizer::Ptr viz;
 
   Frame();
-  void Visualize();
+  void Visualize(bool display_cropped = false);
 };
 
 extern std::vector<Frame> gFrames;

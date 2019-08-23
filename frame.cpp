@@ -7,13 +7,7 @@ Frame::Frame()
 
 }
 
-void Frame::Visualize() {
-  if (label) {
-    QPainter painter(&image);
-    painter.setPen(Qt::red);
-    label->setPixmap(image);
-  }
-
+void Frame::Visualize(bool display_cropped) {
   QRect rect(kSplitLineColumn, 0, image.width(), image.height() - 40);
   QPixmap cropped = image.copy(rect);
   label->setPixmap(cropped);
@@ -38,12 +32,20 @@ void Frame::Visualize() {
       cloud->push_back(point);
     }
   }
+
+  if (label) {
+    if (display_cropped) {
+      label->setPixmap(cropped.scaledToWidth(cropped.width() * 1.7));
+    } else {
+      label->setPixmap(image);
+    }
+  }
+
   if (viz) {
     viz->removeAllPointClouds();
     viz->addPointCloud(cloud);
-    viz->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2);
+    viz->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3);
     viz->setBackgroundColor(255, 255, 255);
-    // viz->spinOnce();
   }
 }
 
