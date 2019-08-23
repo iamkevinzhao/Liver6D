@@ -29,6 +29,8 @@ PCLViewer::PCLViewer (QWidget *parent) :
     for (auto& name : images) {
       Frame frame;
       frame.label = ui->ImageLabel;
+      frame.viz = viewer;
+      frame.id = gFrames.size();
       frame.image = QPixmap(kMediaFolder + "/" + name);
       gFrames.emplace_back(std::move(frame));
     }
@@ -40,6 +42,7 @@ PCLViewer::PCLViewer (QWidget *parent) :
 //  viewer->addPointCloud (cloud, "cloud");
 //  viewer->resetCamera ();
 //  ui->qvtkWidget->update ();
+  viewer->resetCamera();
 
   timer_id_ = startTimer(30);
 }
@@ -54,6 +57,8 @@ void PCLViewer::timerEvent(QTimerEvent *event) {
     gFrames[slider->value()].Visualize();
     slider->setValue(slider->value() + 1);
   }
+
+  ui->qvtkWidget->update();
 }
 
 PCLViewer::~PCLViewer ()
