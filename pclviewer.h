@@ -45,6 +45,8 @@ private slots:
 
   void on_VideoModeButton_clicked();
 
+  void on_ScanIntervalEdit_editingFinished();
+
 private:
   Ui::PCLViewer *ui;
   int timer_id_;

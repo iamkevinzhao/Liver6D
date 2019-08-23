@@ -46,7 +46,7 @@ PCLViewer::PCLViewer (QWidget *parent) :
 //  ui->qvtkWidget->update ();
   viewer->resetCamera();
 
-  timer_id_ = startTimer(30);
+  timer_id_ = startTimer(ui->ScanIntervalEdit->text().toInt());
 }
 
 void PCLViewer::timerEvent(QTimerEvent *event) {
@@ -106,4 +106,9 @@ void PCLViewer::on_VideoModeButton_clicked()
   } else {
     button->setText(kScanOnly);
   }
+}
+
+void PCLViewer::on_ScanIntervalEdit_editingFinished()
+{
+  timer_id_ = startTimer(ui->ScanIntervalEdit->text().toInt());
 }
