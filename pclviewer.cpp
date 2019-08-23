@@ -28,7 +28,8 @@ PCLViewer::PCLViewer (QWidget *parent) :
     gFrames.reserve(images.size());
     for (auto& name : images) {
       Frame frame;
-      frame.image = std::move(QPixmap(kMediaFolder + "/" + name));
+      frame.label = ui->ImageLabel;
+      frame.image = QPixmap(kMediaFolder + "/" + name);
       gFrames.emplace_back(std::move(frame));
     }
   }
@@ -50,10 +51,8 @@ void PCLViewer::timerEvent(QTimerEvent *event) {
 
   if (ui->PlayButton->text() == kPlayButtonPlay) {
     auto slider = ui->PlaySlider;
-    if (slider->value() < gFrames.size()) {
-      ui->ImageLabel->setPixmap(gFrames[slider->value()].image);
-      slider->setValue(slider->value() + 1);
-    }
+    gFrames[slider->value()].Visualize();
+    slider->setValue(slider->value() + 1);
   }
 }
 
@@ -74,17 +73,19 @@ void PCLViewer::on_PlayButton_clicked()
 
 void PCLViewer::on_PlaySlider_valueChanged(int value)
 {
-  ui->ImageLabel->setPixmap(gFrames[value].image);
+  gFrames[ui->PlaySlider->value()].Visualize();
 }
 
 void PCLViewer::on_GoButton_clicked()
 {
   auto slider = ui->PlaySlider;
   slider->setValue(slider->value() + 1);
+  ui->PlayButton->setText(kPlayButtonStop);
 }
 
 void PCLViewer::on_BackButton_clicked()
 {
   auto slider = ui->PlaySlider;
   slider->setValue(slider->value() - 1);
+  ui->PlayButton->setText(kPlayButtonStop);
 }

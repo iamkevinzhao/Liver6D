@@ -3,12 +3,16 @@
 
 #include <QPixmap>
 #include <vector>
+#include <QLabel>
 
 class Frame
 {
 public:
   QPixmap image;
+  QLabel* label = nullptr;
+
   Frame();
+  void Visualize();
 };
 
 extern std::vector<Frame> gFrames;
