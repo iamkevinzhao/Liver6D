@@ -47,6 +47,8 @@ PCLViewer::PCLViewer (QWidget *parent) :
 
   ui->scale->setMinimum(0.0);
   ui->scale->setValue(1.0);
+  ui->alpha->setValue(1.0);
+  ui->filter->setValue(10);
 
   viewer->addCoordinateSystem(50);
 
@@ -65,6 +67,8 @@ PCLViewer::PCLViewer (QWidget *parent) :
   connect(ui->oy, SIGNAL(valueChanged(double)), this, SLOT(TransformEdited()));
   connect(ui->oz, SIGNAL(valueChanged(double)), this, SLOT(TransformEdited()));
   connect(ui->scale, SIGNAL(valueChanged(double)), this, SLOT(TransformEdited()));
+  connect(ui->alpha, SIGNAL(valueChanged(double)), this, SLOT(TransformEdited()));
+  connect(ui->filter, SIGNAL(valueChanged(int)), this, SLOT(TransformEdited()));
 }
 
 void PCLViewer::timerEvent(QTimerEvent *event) {
@@ -75,6 +79,8 @@ void PCLViewer::timerEvent(QTimerEvent *event) {
   if (ui->PlayButton->text() == kPlayButtonStop) {
     auto slider = ui->PlaySlider;
     auto& frame = gFrames[ui->PlaySlider->value()];
+    frame.alpha = ui->alpha->value();
+    frame.filter = ui->filter->value();
     if (frame.trans) {
       frame.Visualize(ui->VideoModeButton->text() == kScanOnly);
       trans_ = *frame.trans;
@@ -101,6 +107,8 @@ void PCLViewer::TransformEdited() {
   trans_.scale(ui->scale->value());
   if (ui->PlayButton->text() == kPlayButtonPlay) {
     auto& frame = gFrames[ui->PlaySlider->value()];
+    frame.alpha = ui->alpha->value();
+    frame.filter = ui->filter->value();
     if (frame.trans) {
       frame.Visualize(ui->VideoModeButton->text() == kScanOnly);
     } else {
@@ -128,6 +136,8 @@ void PCLViewer::on_PlaySlider_valueChanged(int value)
 {
   auto slider = ui->PlaySlider;
   auto& frame = gFrames[ui->PlaySlider->value()];
+  frame.alpha = ui->alpha->value();
+  frame.filter = ui->filter->value();
   if (frame.trans) {
     frame.Visualize(ui->VideoModeButton->text() == kScanOnly);
     trans_ = *frame.trans;
@@ -161,6 +171,8 @@ void PCLViewer::on_VideoModeButton_clicked()
 
   auto slider = ui->PlaySlider;
   auto& frame = gFrames[ui->PlaySlider->value()];
+  frame.alpha = ui->alpha->value();
+  frame.filter = ui->filter->value();
   if (frame.trans) {
     frame.Visualize(ui->VideoModeButton->text() == kScanOnly);
     trans_ = *frame.trans;

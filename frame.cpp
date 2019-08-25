@@ -37,7 +37,7 @@ void Frame::Visualize(const Eigen::Affine3f& trans, bool display_cropped) {
     for (int col = 0; col < scan.width(); ++col) {
       QRgb rgb = scan.pixel(col, row);
 //      if ((qRed(rgb) + qGreen(rgb) + qBlue(rgb)) < 140) {
-      if ((qRed(rgb) + qGreen(rgb) + qBlue(rgb)) < 10) {
+      if ((qRed(rgb) + qGreen(rgb) + qBlue(rgb)) < filter) {
         continue;
       }
       PointT point;

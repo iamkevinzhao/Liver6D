@@ -23,6 +23,7 @@ public:
   pcl::visualization::PCLVisualizer::Ptr viz;
   Eigen::Affine3f* trans = nullptr; // = Eigen::Affine3f::Identity();
   float alpha = 1.0;
+  int filter = 10;
 
   Frame();
   void Visualize(bool display_cropped = false);
