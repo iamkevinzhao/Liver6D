@@ -233,7 +233,11 @@
            </widget>
           </item>
           <item row="2" column="14">
-           <widget class="QSpinBox" name="filter"/>
+           <widget class="QSpinBox" name="filter">
+            <property name="maximum">
+             <number>99999</number>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>

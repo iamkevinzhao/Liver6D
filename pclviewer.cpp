@@ -49,6 +49,7 @@ PCLViewer::PCLViewer (QWidget *parent) :
   ui->scale->setValue(1.0);
   ui->alpha->setValue(1.0);
   ui->filter->setValue(10);
+  ui->filter->setMinimum(10);
 
   viewer->addCoordinateSystem(50);
 
