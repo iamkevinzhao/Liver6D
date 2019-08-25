@@ -45,6 +45,8 @@ PCLViewer::PCLViewer (QWidget *parent) :
   ui->PlaySlider->setMaximum(gFrames.size() - 1);
   ui->PlaySlider->setValue(1);
 
+  viewer->addCoordinateSystem(50);
+
   AddModelToViewer(viewer);
 //  viewer->addPointCloud (cloud, "cloud");
 //  viewer->resetCamera ();
@@ -124,6 +126,143 @@ void PCLViewer::AddModelToViewer(pcl::visualization::PCLVisualizer::Ptr viewer) 
   vein->rgb = {0, 0, 1.0};
 
   VeinTree* v;
+
+  auto mhv = v = new VeinTree(vein);
+  v->Spawn(0, 0, -15);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(vein);
+  v->Spawn(15, -2, -10);
+  v->radius *= 0.7f;
+
+  v = new VeinTree(v);
+  v->Spawn(13, -2, -10);
+  v->radius *= 0.95f;
+
+  auto lhv1 = v = new VeinTree(v);
+  v->Spawn(15, -1, -15);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(v);
+  v->Spawn(10, -1, -15);
+  v->radius *= 0.95f;
+
+  auto lhv2 = v = new VeinTree(v);
+  v->Spawn(5, -1, -10);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(v);
+  v->Spawn(5, -1, -13);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(v);
+  v->Spawn(5, -1, -15);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(v);
+  v->Spawn(1, -1, -15);
+  v->radius *= 0.95f;
+
+  auto lhv3 = v = new VeinTree(v);
+  v->Spawn(-3, -1, -15);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(v);
+  v->Spawn(-10, -1, -15);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(lhv3);
+  v->Spawn(10, -1, -15);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(lhv2);
+  v->Spawn(-5, -1, -10);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(v);
+  v->Spawn(-10, 1, -10);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(lhv1);
+  v->Spawn(20, 3, -5);
+  v->radius *= 0.8f;
+
+  v = new VeinTree(v);
+  v->Spawn(20, 1, -2);
+  v->radius *= 0.95f;
+
+  auto mhv1 = v = new VeinTree(mhv);
+  v->Spawn(-5, -10, -10);
+  v->radius *= 0.7f;
+
+  v = new VeinTree(v);
+  v->Spawn(-15, -10, -7);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(mhv1);
+  v->Spawn(15, -5, -7);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(v);
+  v->Spawn(15, -5, -15);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(v);
+  v->Spawn(10, -3, -15);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(v);
+  v->Spawn(5, -3, -15);
+  v->radius *= 0.95f;
+
+  auto mhv2 = v = new VeinTree(v);
+  v->Spawn(-0, -3, -15);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(mhv2);
+  v->Spawn(-5, -3, -15);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(v);
+  v->Spawn(-5, -1, -15);
+  v->radius *= 0.95f;
+
+  auto mhv3 = v = new VeinTree(v);
+  v->Spawn(-10, -1, -15);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(v);
+  v->Spawn(-15, 1, -15);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(v);
+  v->Spawn(-20, 1, -15);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(mhv3);
+  v->Spawn(10, 2, -15);
+  v->radius *= 0.9f;
+
+  v = new VeinTree(mhv2);
+  v->Spawn(10, -3, -11);
+  v->radius *= 0.75f;
+
+  v = new VeinTree(vein);
+  v->Spawn(0, 0, -40);
+  v->radius *= 0.95f;
+
+  v = new VeinTree(v);
+  v->Spawn(0, 0, -40);
+  v->radius *= 0.95f;
+
+//  v = new VeinTree(v);
+//  v->Spawn(0, 0, -40);
+//  v->radius *= 0.95f;
+
+  v = new VeinTree(v);
+  v->Spawn(0, 0, -40);
+  v->radius *= 0.95f;
+
   v = new VeinTree(vein);
   v->Spawn(-20, 0, -5);
   v->radius *= 0.7f;
