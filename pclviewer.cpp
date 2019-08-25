@@ -45,6 +45,9 @@ PCLViewer::PCLViewer (QWidget *parent) :
   ui->PlaySlider->setMaximum(gFrames.size() - 1);
   ui->PlaySlider->setValue(1);
 
+  ui->scale->setMinimum(0.0);
+  ui->scale->setValue(1.0);
+
   viewer->addCoordinateSystem(50);
 
   AddModelToViewer(viewer);
@@ -54,6 +57,14 @@ PCLViewer::PCLViewer (QWidget *parent) :
   viewer->resetCamera();
 
   timer_id_ = startTimer(ui->ScanIntervalEdit->text().toInt());
+
+  connect(ui->px, SIGNAL(valueChanged(double)), this, SLOT(TransformEdited()));
+  connect(ui->py, SIGNAL(valueChanged(double)), this, SLOT(TransformEdited()));
+  connect(ui->pz, SIGNAL(valueChanged(double)), this, SLOT(TransformEdited()));
+  connect(ui->ox, SIGNAL(valueChanged(double)), this, SLOT(TransformEdited()));
+  connect(ui->oy, SIGNAL(valueChanged(double)), this, SLOT(TransformEdited()));
+  connect(ui->oz, SIGNAL(valueChanged(double)), this, SLOT(TransformEdited()));
+  connect(ui->scale, SIGNAL(valueChanged(double)), this, SLOT(TransformEdited()));
 }
 
 void PCLViewer::timerEvent(QTimerEvent *event) {
@@ -61,13 +72,41 @@ void PCLViewer::timerEvent(QTimerEvent *event) {
     return;
   }
 
-  if (ui->PlayButton->text() == kPlayButtonPlay) {
+  if (ui->PlayButton->text() == kPlayButtonStop) {
     auto slider = ui->PlaySlider;
-    gFrames[slider->value()].Visualize(ui->VideoModeButton->text() == kScanOnly);
+    auto& frame = gFrames[ui->PlaySlider->value()];
+    if (frame.trans) {
+      frame.Visualize(ui->VideoModeButton->text() == kScanOnly);
+      trans_ = *frame.trans;
+    } else {
+      frame.Visualize(trans_, ui->VideoModeButton->text() == kScanOnly);
+    }
+    // gFrames[slider->value()].Visualize(ui->VideoModeButton->text() == kScanOnly);
     slider->setValue(slider->value() + 1);
   }
 
   ui->qvtkWidget->update();
+}
+
+void PCLViewer::TransformEdited() {
+  trans_.setIdentity();
+  trans_.translate(Eigen::Vector3f(ui->px->value(), ui->py->value(), ui->pz->value()));
+  trans_.rotate(
+      Eigen::AngleAxisf(
+          ui->ox->value() * M_PI / 180.0, Eigen::Vector3f::UnitX()) *
+      Eigen::AngleAxisf(
+          ui->oy->value() * M_PI / 180.0, Eigen::Vector3f::UnitY()) *
+      Eigen::AngleAxisf(
+          ui->oz->value() * M_PI / 180.0, Eigen::Vector3f::UnitZ()));
+  trans_.scale(ui->scale->value());
+  if (ui->PlayButton->text() == kPlayButtonPlay) {
+    auto& frame = gFrames[ui->PlaySlider->value()];
+    if (frame.trans) {
+      frame.Visualize(ui->VideoModeButton->text() == kScanOnly);
+    } else {
+      frame.Visualize(trans_, ui->VideoModeButton->text() == kScanOnly);
+    }
+  }
 }
 
 PCLViewer::~PCLViewer ()
@@ -87,21 +126,28 @@ void PCLViewer::on_PlayButton_clicked()
 
 void PCLViewer::on_PlaySlider_valueChanged(int value)
 {
-  gFrames[ui->PlaySlider->value()].Visualize(ui->VideoModeButton->text() == kScanOnly);
+  auto slider = ui->PlaySlider;
+  auto& frame = gFrames[ui->PlaySlider->value()];
+  if (frame.trans) {
+    frame.Visualize(ui->VideoModeButton->text() == kScanOnly);
+    trans_ = *frame.trans;
+  } else {
+    frame.Visualize(trans_, ui->VideoModeButton->text() == kScanOnly);
+  }
 }
 
 void PCLViewer::on_GoButton_clicked()
 {
   auto slider = ui->PlaySlider;
   slider->setValue(slider->value() + 1);
-  ui->PlayButton->setText(kPlayButtonStop);
+  ui->PlayButton->setText(kPlayButtonPlay);
 }
 
 void PCLViewer::on_BackButton_clicked()
 {
   auto slider = ui->PlaySlider;
   slider->setValue(slider->value() - 1);
-  ui->PlayButton->setText(kPlayButtonStop);
+  ui->PlayButton->setText(kPlayButtonPlay);
 }
 
 void PCLViewer::on_VideoModeButton_clicked()
@@ -111,6 +157,15 @@ void PCLViewer::on_VideoModeButton_clicked()
     button->setText(kFullVideo);
   } else {
     button->setText(kScanOnly);
+  }
+
+  auto slider = ui->PlaySlider;
+  auto& frame = gFrames[ui->PlaySlider->value()];
+  if (frame.trans) {
+    frame.Visualize(ui->VideoModeButton->text() == kScanOnly);
+    trans_ = *frame.trans;
+  } else {
+    frame.Visualize(trans_, ui->VideoModeButton->text() == kScanOnly);
   }
 }
 

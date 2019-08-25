@@ -38,6 +38,8 @@ protected:
   void AddModelToViewer(pcl::visualization::PCLVisualizer::Ptr viewer);
 
 private slots:
+  void TransformEdited();
+
   void on_PlayButton_clicked();
 
   void on_PlaySlider_valueChanged(int value);
@@ -53,4 +55,5 @@ private slots:
 private:
   Ui::PCLViewer *ui;
   int timer_id_;
+  Eigen::Affine3f trans_ = Eigen::Affine3f::Identity();
 };

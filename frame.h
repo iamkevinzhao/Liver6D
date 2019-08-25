@@ -21,10 +21,12 @@ public:
   const static int kSplitLineColumn = 270;
   // PointCloudT::Ptr cloud;
   pcl::visualization::PCLVisualizer::Ptr viz;
-  float scale = 1.0;
+  Eigen::Affine3f* trans = nullptr; // = Eigen::Affine3f::Identity();
+  float alpha = 1.0;
 
   Frame();
   void Visualize(bool display_cropped = false);
+  void Visualize(const Eigen::Affine3f& trans, bool display_cropped = false);
 };
 
 extern std::vector<Frame> gFrames;
