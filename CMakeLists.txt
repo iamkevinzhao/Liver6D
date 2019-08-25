@@ -23,6 +23,8 @@ add_executable(
     pclviewer.ui
     frame.cpp
     frame.h
+    vein_tree.cpp
+    vein_tree.h
 )
 
 target_link_libraries(

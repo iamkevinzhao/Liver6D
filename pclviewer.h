@@ -34,6 +34,9 @@ protected:
 
   pcl::visualization::PCLVisualizer::Ptr viewer;
 
+ private:
+  void AddModelToViewer(pcl::visualization::PCLVisualizer::Ptr viewer);
+
 private slots:
   void on_PlayButton_clicked();
 
