@@ -25,6 +25,9 @@ void Frame::Visualize(bool display_cropped) {
       point.x = col - half_w;
       point.y = row - half_h;
       point.z = 0.0f;
+      point.x *= scale;
+      point.y *= scale;
+      point.z *= scale;
       point.r = qRed(rgb);
       point.g = qGreen(rgb);
       point.b = qBlue(rgb);

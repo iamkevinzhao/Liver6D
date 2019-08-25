@@ -21,6 +21,7 @@ public:
   const static int kSplitLineColumn = 270;
   // PointCloudT::Ptr cloud;
   pcl::visualization::PCLVisualizer::Ptr viz;
+  float scale = 1.0;
 
   Frame();
   void Visualize(bool display_cropped = false);
