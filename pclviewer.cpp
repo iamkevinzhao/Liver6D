@@ -35,15 +35,17 @@ PCLViewer::PCLViewer (QWidget *parent) :
       frame.viz = viewer;
       frame.id = gFrames.size();
       frame.image = QPixmap(kMediaFolder + "/" + name);
-      if (frame.id % 100 == 0) {
-        frame.trans = new Eigen::Affine3f;
-        frame.trans->setIdentity();
-        frame.trans->rotate(Eigen::AngleAxisf(frame.id, Eigen::Vector3f::UnitX()));
-        frame.Show();
-      }
+//      if (frame.id % 100 == 0) {
+//        frame.trans = new Eigen::Affine3f;
+//        frame.trans->setIdentity();
+//        frame.trans->rotate(Eigen::AngleAxisf(frame.id, Eigen::Vector3f::UnitX()));
+//        frame.Show();
+//      }
       gFrames.emplace_back(std::move(frame));
     }
   }
+
+  SetFramesFromFile();
 
 //  this->showFullScreen();
 
@@ -125,6 +127,11 @@ void PCLViewer::DisplayCurrentFrame() {
     frame.Visualize(ui->VideoModeButton->text() == kScanOnly);
   } else {
     frame.Visualize(trans_, ui->VideoModeButton->text() == kScanOnly);
+  }
+  if (frame.trans) {
+    ui->DisplayBox->setChecked(true);
+  } else {
+    ui->DisplayBox->setChecked(false);
   }
 }
 
@@ -392,8 +399,62 @@ void PCLViewer::AddModelToViewer(pcl::visualization::PCLVisualizer::Ptr viewer) 
   v->radius *= 0.95f;
 
   vein->Plot();
-//  pcl::ModelCoefficients coef;
-//  coef.values = {0, 0, 0, 0, 0, 100, 10};
-//  viewer->addCylinder(coef);
-//  viewer->setShapeRenderingProperties( pcl::visualization::PCL_VISUALIZER_COLOR, 0.2, 0.45, 0, "cylinder");
+}
+
+void PCLViewer::on_SaveButton_clicked()
+{
+  std::ofstream os;
+  os.open("cuts.txt");
+  for (auto& frame : gFrames) {
+    if (frame.trans) {
+      os << frame.Write() << "\n";
+    }
+  }
+  os.close();
+}
+
+void PCLViewer::SetFramesFromFile() {
+//  if (frame.id % 100 == 0) {
+//    frame.trans = new Eigen::Affine3f;
+//    frame.trans->setIdentity();
+//    frame.trans->rotate(Eigen::AngleAxisf(frame.id, Eigen::Vector3f::UnitX()));
+//    frame.Show();
+//  }
+  std::ifstream is;
+  is.open("cuts.txt");
+  std::string line;
+  while (std::getline(is, line)) {
+    std::istringstream iss(line);
+    int id;
+    iss >> id;
+    Eigen::Affine3f::Scalar array[16];
+    Eigen::Affine3f trans;
+    for (int i = 0; i < 16; ++i) {
+      // iss >> array[i];
+      iss >> trans.data()[i];
+    }
+        // = Eigen::Map<Eigen::Matrix<float, 4, 4, Eigen::ColMajor>>(array);
+    auto& frame = gFrames[id];
+    if (frame.trans) {
+      delete frame.trans;
+      frame.trans = nullptr;
+    }
+    frame.trans = new Eigen::Affine3f;
+    *frame.trans = trans;
+    frame.Show();
+  }
+}
+
+void PCLViewer::on_DisplayButton_clicked()
+{
+  auto& frame = gFrames[ui->PlaySlider->value()];
+  if (frame.trans) {
+    delete frame.trans;
+    frame.trans = nullptr;
+    ui->DisplayBox->setChecked(false);
+  } else {
+    frame.trans = new Eigen::Affine3f;
+    *frame.trans = trans_;
+    ui->DisplayBox->setChecked(true);
+  }
 }

@@ -126,4 +126,14 @@ void Frame::Hide() {
   }
 }
 
+std::string Frame::Write() {
+  std::stringstream ss;
+  auto data = trans->data();
+  ss << id << " ";
+  for (int i = 0; i < 16; ++i) {
+    ss << data[i] << " ";
+  }
+  return ss.str();
+}
+
 std::vector<Frame> gFrames;

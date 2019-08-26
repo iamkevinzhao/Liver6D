@@ -239,6 +239,27 @@
             </property>
            </widget>
           </item>
+          <item row="0" column="9">
+           <widget class="QPushButton" name="SaveButton">
+            <property name="text">
+             <string>Save</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="8">
+           <widget class="QCheckBox" name="DisplayBox">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="7">
+           <widget class="QPushButton" name="DisplayButton">
+            <property name="text">
+             <string>Display</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>

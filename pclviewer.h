@@ -37,6 +37,7 @@ protected:
  private:
   void AddModelToViewer(pcl::visualization::PCLVisualizer::Ptr viewer);
   void DisplayCurrentFrame();
+  void SetFramesFromFile();
 
 private slots:
   void TransformEdited();
@@ -52,6 +53,10 @@ private slots:
   void on_VideoModeButton_clicked();
 
   void on_ScanIntervalEdit_editingFinished();
+
+  void on_SaveButton_clicked();
+
+  void on_DisplayButton_clicked();
 
 private:
   Ui::PCLViewer *ui;

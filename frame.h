@@ -31,6 +31,8 @@ public:
   void Visualize(const Eigen::Affine3f& trans, bool display_cropped = false);
   void Show();
   void Hide();
+  std::string Write();
+  void Read(const std::string& entry);
 };
 
 extern std::vector<Frame> gFrames;
