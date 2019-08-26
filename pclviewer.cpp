@@ -107,14 +107,18 @@ void PCLViewer::TransformEdited() {
           ui->oz->value() * M_PI / 180.0, Eigen::Vector3f::UnitZ()));
   trans_.scale(ui->scale->value());
   if (ui->PlayButton->text() == kPlayButtonPlay) {
-    auto& frame = gFrames[ui->PlaySlider->value()];
-    frame.alpha = ui->alpha->value();
-    frame.filter = ui->filter->value();
-    if (frame.trans) {
-      frame.Visualize(ui->VideoModeButton->text() == kScanOnly);
-    } else {
-      frame.Visualize(trans_, ui->VideoModeButton->text() == kScanOnly);
-    }
+    DisplayCurrentFrame();
+  }
+}
+
+void PCLViewer::DisplayCurrentFrame() {
+  auto& frame = gFrames[ui->PlaySlider->value()];
+  frame.alpha = ui->alpha->value();
+  frame.filter = ui->filter->value();
+  if (frame.trans) {
+    frame.Visualize(ui->VideoModeButton->text() == kScanOnly);
+  } else {
+    frame.Visualize(trans_, ui->VideoModeButton->text() == kScanOnly);
   }
 }
 
@@ -135,16 +139,7 @@ void PCLViewer::on_PlayButton_clicked()
 
 void PCLViewer::on_PlaySlider_valueChanged(int value)
 {
-  auto slider = ui->PlaySlider;
-  auto& frame = gFrames[ui->PlaySlider->value()];
-  frame.alpha = ui->alpha->value();
-  frame.filter = ui->filter->value();
-  if (frame.trans) {
-    frame.Visualize(ui->VideoModeButton->text() == kScanOnly);
-    trans_ = *frame.trans;
-  } else {
-    frame.Visualize(trans_, ui->VideoModeButton->text() == kScanOnly);
-  }
+  DisplayCurrentFrame();
 }
 
 void PCLViewer::on_GoButton_clicked()
@@ -170,16 +165,7 @@ void PCLViewer::on_VideoModeButton_clicked()
     button->setText(kScanOnly);
   }
 
-  auto slider = ui->PlaySlider;
-  auto& frame = gFrames[ui->PlaySlider->value()];
-  frame.alpha = ui->alpha->value();
-  frame.filter = ui->filter->value();
-  if (frame.trans) {
-    frame.Visualize(ui->VideoModeButton->text() == kScanOnly);
-    trans_ = *frame.trans;
-  } else {
-    frame.Visualize(trans_, ui->VideoModeButton->text() == kScanOnly);
-  }
+  DisplayCurrentFrame();
 }
 
 void PCLViewer::on_ScanIntervalEdit_editingFinished()

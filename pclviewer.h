@@ -36,6 +36,7 @@ protected:
 
  private:
   void AddModelToViewer(pcl::visualization::PCLVisualizer::Ptr viewer);
+  void DisplayCurrentFrame();
 
 private slots:
   void TransformEdited();
