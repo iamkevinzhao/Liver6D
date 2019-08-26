@@ -19,6 +19,7 @@ public:
   QPixmap image;
   QLabel* label = nullptr;
   const static int kSplitLineColumn = 270;
+  static std::string previous_visual_id;
   // PointCloudT::Ptr cloud;
   pcl::visualization::PCLVisualizer::Ptr viz;
   Eigen::Affine3f* trans = nullptr; // = Eigen::Affine3f::Identity();
@@ -28,6 +29,8 @@ public:
   Frame();
   void Visualize(bool display_cropped = false);
   void Visualize(const Eigen::Affine3f& trans, bool display_cropped = false);
+  void Show();
+  void Hide();
 };
 
 extern std::vector<Frame> gFrames;

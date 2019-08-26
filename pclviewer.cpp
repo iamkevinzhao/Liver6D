@@ -35,6 +35,12 @@ PCLViewer::PCLViewer (QWidget *parent) :
       frame.viz = viewer;
       frame.id = gFrames.size();
       frame.image = QPixmap(kMediaFolder + "/" + name);
+      if (frame.id % 100 == 0) {
+        frame.trans = new Eigen::Affine3f;
+        frame.trans->setIdentity();
+        frame.trans->rotate(Eigen::AngleAxisf(frame.id, Eigen::Vector3f::UnitX()));
+        frame.Show();
+      }
       gFrames.emplace_back(std::move(frame));
     }
   }
