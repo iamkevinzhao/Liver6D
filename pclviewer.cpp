@@ -133,6 +133,7 @@ void PCLViewer::DisplayCurrentFrame() {
   } else {
     ui->DisplayBox->setChecked(false);
   }
+  ui->FrameEdit->setPlaceholderText(QString::number(frame.id));
 }
 
 PCLViewer::~PCLViewer ()
@@ -184,6 +185,58 @@ void PCLViewer::on_VideoModeButton_clicked()
 void PCLViewer::on_ScanIntervalEdit_editingFinished()
 {
   timer_id_ = startTimer(ui->ScanIntervalEdit->text().toInt());
+}
+
+void PCLViewer::on_SaveButton_clicked()
+{
+  std::ofstream os;
+  os.open("cuts.txt");
+  for (auto& frame : gFrames) {
+    if (frame.trans) {
+      os << frame.Write() << "\n";
+    }
+  }
+  os.close();
+}
+
+void PCLViewer::SetFramesFromFile() {
+  std::ifstream is;
+  is.open("cuts.txt");
+  std::string line;
+  while (std::getline(is, line)) {
+    std::istringstream iss(line);
+    int id;
+    iss >> id;
+    Eigen::Affine3f::Scalar array[16];
+    Eigen::Affine3f trans;
+    for (int i = 0; i < 16; ++i) {
+      // iss >> array[i];
+      iss >> trans.data()[i];
+    }
+        // = Eigen::Map<Eigen::Matrix<float, 4, 4, Eigen::ColMajor>>(array);
+    auto& frame = gFrames[id];
+    if (frame.trans) {
+      delete frame.trans;
+      frame.trans = nullptr;
+    }
+    frame.trans = new Eigen::Affine3f;
+    *frame.trans = trans;
+    frame.Show();
+  }
+}
+
+void PCLViewer::on_DisplayButton_clicked()
+{
+  auto& frame = gFrames[ui->PlaySlider->value()];
+  if (frame.trans) {
+    delete frame.trans;
+    frame.trans = nullptr;
+    ui->DisplayBox->setChecked(false);
+  } else {
+    frame.trans = new Eigen::Affine3f;
+    *frame.trans = trans_;
+    ui->DisplayBox->setChecked(true);
+  }
 }
 
 void PCLViewer::AddModelToViewer(pcl::visualization::PCLVisualizer::Ptr viewer) {
@@ -401,60 +454,3 @@ void PCLViewer::AddModelToViewer(pcl::visualization::PCLVisualizer::Ptr viewer) 
   vein->Plot();
 }
 
-void PCLViewer::on_SaveButton_clicked()
-{
-  std::ofstream os;
-  os.open("cuts.txt");
-  for (auto& frame : gFrames) {
-    if (frame.trans) {
-      os << frame.Write() << "\n";
-    }
-  }
-  os.close();
-}
-
-void PCLViewer::SetFramesFromFile() {
-//  if (frame.id % 100 == 0) {
-//    frame.trans = new Eigen::Affine3f;
-//    frame.trans->setIdentity();
-//    frame.trans->rotate(Eigen::AngleAxisf(frame.id, Eigen::Vector3f::UnitX()));
-//    frame.Show();
-//  }
-  std::ifstream is;
-  is.open("cuts.txt");
-  std::string line;
-  while (std::getline(is, line)) {
-    std::istringstream iss(line);
-    int id;
-    iss >> id;
-    Eigen::Affine3f::Scalar array[16];
-    Eigen::Affine3f trans;
-    for (int i = 0; i < 16; ++i) {
-      // iss >> array[i];
-      iss >> trans.data()[i];
-    }
-        // = Eigen::Map<Eigen::Matrix<float, 4, 4, Eigen::ColMajor>>(array);
-    auto& frame = gFrames[id];
-    if (frame.trans) {
-      delete frame.trans;
-      frame.trans = nullptr;
-    }
-    frame.trans = new Eigen::Affine3f;
-    *frame.trans = trans;
-    frame.Show();
-  }
-}
-
-void PCLViewer::on_DisplayButton_clicked()
-{
-  auto& frame = gFrames[ui->PlaySlider->value()];
-  if (frame.trans) {
-    delete frame.trans;
-    frame.trans = nullptr;
-    ui->DisplayBox->setChecked(false);
-  } else {
-    frame.trans = new Eigen::Affine3f;
-    *frame.trans = trans_;
-    ui->DisplayBox->setChecked(true);
-  }
-}
