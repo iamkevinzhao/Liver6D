@@ -19,6 +19,7 @@ add_executable(
 #    main_window.h
 #    main_window.ui
     pclviewer.cpp
+    pclviewer_model.cpp
     pclviewer.h
     pclviewer.ui
     frame.cpp

@@ -52,7 +52,7 @@ void Frame::Visualize(const Eigen::Affine3f& trans, bool display_cropped) {
       point.r = qRed(rgb);
       point.g = qGreen(rgb);
       point.b = qBlue(rgb);
-      point.a = 255 * alpha;
+      point.a = 255 * 0.5;
 
       Eigen::Vector3f transformed;
       pcl::transformPoint(Eigen::Vector3f(point.x, point.y, point.z), transformed, trans);
@@ -65,6 +65,7 @@ void Frame::Visualize(const Eigen::Affine3f& trans, bool display_cropped) {
 
   if (label) {
     if (display_cropped) {
+//      label->setPixmap(cropped.scaledToWidth(cropped.width() * 0.5));
       label->setPixmap(cropped.scaledToWidth(cropped.width() * 1.7));
     } else {
       label->setPixmap(image);
