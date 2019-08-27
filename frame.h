@@ -29,6 +29,7 @@ public:
   Frame();
   void Visualize(bool display_cropped = false);
   void Visualize(const Eigen::Affine3f& trans, bool display_cropped = false);
+  void RemoveVisual();
   void Show();
   void Hide();
   std::string Write();

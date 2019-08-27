@@ -58,6 +58,10 @@ private slots:
 
   void on_DisplayButton_clicked();
 
+  void on_DemoButton_clicked();
+
+  void on_FrameEdit_returnPressed();
+
 private:
   Ui::PCLViewer *ui;
   int timer_id_;

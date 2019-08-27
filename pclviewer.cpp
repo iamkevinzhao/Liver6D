@@ -12,6 +12,8 @@ const QString kPlayButtonStop = "Stop";
 const QString kScanOnly = "Scan-Only Mode";
 const QString kFullVideo = "Full-Video Mode";
 
+bool gProtect = false;
+
 PCLViewer::PCLViewer (QWidget *parent) :
   QMainWindow (parent),
   ui (new Ui::PCLViewer)
@@ -87,15 +89,16 @@ void PCLViewer::timerEvent(QTimerEvent *event) {
 
   if (ui->PlayButton->text() == kPlayButtonStop) {
     auto slider = ui->PlaySlider;
-    auto& frame = gFrames[ui->PlaySlider->value()];
-    frame.alpha = ui->alpha->value();
-    frame.filter = ui->filter->value();
-    if (frame.trans) {
-      frame.Visualize(ui->VideoModeButton->text() == kScanOnly);
-      trans_ = *frame.trans;
-    } else {
-      frame.Visualize(trans_, ui->VideoModeButton->text() == kScanOnly);
-    }
+//    auto& frame = gFrames[ui->PlaySlider->value()];
+//    frame.alpha = ui->alpha->value();
+//    frame.filter = ui->filter->value();
+//    if (frame.trans) {
+//      frame.Visualize(ui->VideoModeButton->text() == kScanOnly);
+//      trans_ = *frame.trans;
+//    } else {
+//      frame.Visualize(trans_, ui->VideoModeButton->text() == kScanOnly);
+//    }
+    DisplayCurrentFrame();
     // gFrames[slider->value()].Visualize(ui->VideoModeButton->text() == kScanOnly);
     slider->setValue(slider->value() + 1);
   }
@@ -104,6 +107,9 @@ void PCLViewer::timerEvent(QTimerEvent *event) {
 }
 
 void PCLViewer::TransformEdited() {
+  if (gProtect) {
+    return;
+  }
   trans_.setIdentity();
   trans_.translate(Eigen::Vector3f(ui->px->value(), ui->py->value(), ui->pz->value()));
   trans_.rotate(
@@ -125,15 +131,42 @@ void PCLViewer::DisplayCurrentFrame() {
   frame.filter = ui->filter->value();
   if (frame.trans) {
     frame.Visualize(ui->VideoModeButton->text() == kScanOnly);
+    trans_ = *frame.trans;
   } else {
     frame.Visualize(trans_, ui->VideoModeButton->text() == kScanOnly);
   }
+  gProtect = true;
+  ui->px->setValue(trans_.translation().x());
+  ui->py->setValue(trans_.translation().y());
+  ui->pz->setValue(trans_.translation().z());
+  ui->ox->setValue(trans_.rotation().eulerAngles(0, 1, 2)[0] * 180.0 / M_PI);
+  ui->oy->setValue(trans_.rotation().eulerAngles(0, 1, 2)[1] * 180.0 / M_PI);
+  ui->oz->setValue(trans_.rotation().eulerAngles(0, 1, 2)[2] * 180.0 / M_PI);
+  gProtect = false;
+
   if (frame.trans) {
     ui->DisplayBox->setChecked(true);
   } else {
     ui->DisplayBox->setChecked(false);
   }
   ui->FrameEdit->setPlaceholderText(QString::number(frame.id));
+
+  static int buffer = 0;
+
+  if (!ui->DemoButton->isEnabled()) {
+    if (frame.id == (gFrames.size() - 1)) {
+      ui->DemoButton->setEnabled(true);
+    }
+    if (frame.trans) {
+      frame.Show();
+      buffer = 10;
+    } else {
+      --buffer;
+      if (buffer < 0) {
+        frame.RemoveVisual();
+      }
+    }
+  }
 }
 
 PCLViewer::~PCLViewer ()
@@ -148,6 +181,7 @@ void PCLViewer::on_PlayButton_clicked()
     button->setText(kPlayButtonStop);
   } else {
     button->setText(kPlayButtonPlay);
+    ui->DemoButton->setEnabled(true);
   }
 }
 
@@ -237,6 +271,22 @@ void PCLViewer::on_DisplayButton_clicked()
     *frame.trans = trans_;
     ui->DisplayBox->setChecked(true);
   }
+  frame.Show();
+}
+
+void PCLViewer::on_FrameEdit_returnPressed()
+{
+  ui->PlaySlider->setValue(ui->FrameEdit->text().toInt());
+  ui->FrameEdit->clear();
+}
+
+void PCLViewer::on_DemoButton_clicked()
+{
+  for (auto& frame : gFrames) {
+    frame.Hide();
+  }
+  ui->PlaySlider->setValue(0);
+  ui->DemoButton->setDisabled(true);
 }
 
 void PCLViewer::AddModelToViewer(pcl::visualization::PCLVisualizer::Ptr viewer) {
@@ -453,4 +503,3 @@ void PCLViewer::AddModelToViewer(pcl::visualization::PCLVisualizer::Ptr viewer) 
 
   vein->Plot();
 }
-

@@ -126,6 +126,12 @@ void Frame::Hide() {
   }
 }
 
+void Frame::RemoveVisual() {
+  if (viz) {
+    viz->removePointCloud("cloud" + std::to_string(id));
+  }
+}
+
 std::string Frame::Write() {
   std::stringstream ss;
   auto data = trans->data();
