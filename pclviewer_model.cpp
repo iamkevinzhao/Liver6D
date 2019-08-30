@@ -5,7 +5,7 @@ void PCLViewer::AddModelToViewer(pcl::visualization::PCLVisualizer::Ptr viewer) 
   VeinTree* vein = new VeinTree();
   vein->Spawn(0, 0, -20);
   vein->viewer = viewer;
-  vein->rgb = {0, 0, 1.0};
+  vein->rgb = {0, 0, 102.0 / 255};
 
   VeinTree* v;
 
@@ -213,7 +213,7 @@ void PCLViewer::AddModelToViewer(pcl::visualization::PCLVisualizer::Ptr viewer) 
   v->Spawn(15, -15, -15);
   v->radius *= 0.95f;
 
-  vein->Plot();
+  // vein->Plot();
 
   ////////////////////////////////////////////////
 
@@ -221,7 +221,7 @@ void PCLViewer::AddModelToViewer(pcl::visualization::PCLVisualizer::Ptr viewer) 
   portal->root = {-10, -10, -250};
   portal->Spawn(0, 0, 20);
   portal->viewer = viewer;
-  portal->rgb = {0, 1.0, 0};
+  portal->rgb = {51.0 / 255, 51.0 / 255, 1.0};
 
   v = new VeinTree(portal);
   v->Spawn(-2, 2, 20);
@@ -311,7 +311,7 @@ void PCLViewer::AddModelToViewer(pcl::visualization::PCLVisualizer::Ptr viewer) 
   v->Spawn(-12, -1, 0);
   v->radius *= 0.95f;
 
-  portal->Plot();
+  // portal->Plot();
 
   //////////////////////////////////////
 
@@ -319,7 +319,7 @@ void PCLViewer::AddModelToViewer(pcl::visualization::PCLVisualizer::Ptr viewer) 
   ligament->root = {40, -15, -195};
   ligament->Spawn(0, 5, 5);
   ligament->viewer = viewer;
-  ligament->rgb = {1.0, 1.0, 0};
+  ligament->rgb = {102.0 / 255, 102.0 / 255, 1.0};
   ligament->radius *= 0.6f;
 
   v = new VeinTree(ligament);
@@ -339,5 +339,59 @@ void PCLViewer::AddModelToViewer(pcl::visualization::PCLVisualizer::Ptr viewer) 
   v->radius *= 0.95f;
 
 
-  ligament->Plot();
+  // ligament->Plot();
+
+  ///////////////////////////////////////
+
+  Eigen::Affine3f trans;
+  trans.setIdentity();
+  trans.translate(Eigen::Vector3f(10, 20, -120));
+  trans.rotate(
+      Eigen::AngleAxisf(
+          270 * M_PI / 180.0, Eigen::Vector3f::UnitX()) *
+      Eigen::AngleAxisf(
+          0 * M_PI / 180.0, Eigen::Vector3f::UnitY()) *
+      Eigen::AngleAxisf(
+          0 * M_PI / 180.0, Eigen::Vector3f::UnitZ()));
+  trans.scale(1.1);
+
+  QPixmap contour = QPixmap("liver_contour.jpg");
+  QImage scan = contour.toImage();
+  PointCloudT::Ptr cloud(new PointCloudT);
+  cloud->reserve(scan.width() * scan.height());
+  int half_w = scan.width() / 2, half_h = scan.height() / 2;
+  for (int row = 0; row < scan.height(); ++row) {
+    for (int col = 0; col < scan.width(); ++col) {
+      QRgb rgb = scan.pixel(col, row);
+//      if ((qRed(rgb) + qGreen(rgb) + qBlue(rgb)) < 140) {
+      if ((qRed(rgb) + qGreen(rgb) + qBlue(rgb)) < 10) {
+        continue;
+      }
+      if ((qRed(rgb) > 250) && (qGreen(rgb) > 250) && (qBlue(rgb) > 250)) {
+        continue;
+      }
+      PointT point;
+      point.x = col - half_w;
+      point.y = row - half_h;
+      point.z = 0.0f;
+      point.r = qRed(rgb);
+      point.g = qGreen(rgb);
+      point.b = qBlue(rgb);
+      point.a = 255 * 1.0;
+
+
+      Eigen::Vector3f transformed;
+      pcl::transformPoint(Eigen::Vector3f(point.x, point.y, point.z), transformed, trans);
+      point.x = transformed.x();
+      point.y = transformed.y();
+      point.z = transformed.z();
+      cloud->push_back(point);
+    }
+  }
+
+  if (viewer) {
+    viewer->addPointCloud(cloud, "contour");
+    viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "contour");
+    viewer->setBackgroundColor(255, 255, 255);
+  }
 }

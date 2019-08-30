@@ -49,7 +49,7 @@ PCLViewer::PCLViewer (QWidget *parent) :
 
   SetFramesFromFile();
 
-//  this->showFullScreen();
+  this->showFullScreen();
 
   ui->PlaySlider->setMinimum(0);
   ui->PlaySlider->setMaximum(gFrames.size() - 1);
@@ -61,7 +61,7 @@ PCLViewer::PCLViewer (QWidget *parent) :
   ui->filter->setValue(10);
   ui->filter->setMinimum(10);
 
-  viewer->addCoordinateSystem(50);
+  // viewer->addCoordinateSystem(50);
 
   AddModelToViewer(viewer);
 //  viewer->addPointCloud (cloud, "cloud");
@@ -80,6 +80,41 @@ PCLViewer::PCLViewer (QWidget *parent) :
   connect(ui->scale, SIGNAL(valueChanged(double)), this, SLOT(TransformEdited()));
   connect(ui->alpha, SIGNAL(valueChanged(double)), this, SLOT(TransformEdited()));
   connect(ui->filter, SIGNAL(valueChanged(int)), this, SLOT(TransformEdited()));
+
+  if (true) {
+    ui->ox->setVisible(false);
+    ui->oy->setVisible(false);
+    ui->oz->setVisible(false);
+    ui->px->setVisible(false);
+    ui->py->setVisible(false);
+    ui->pz->setVisible(false);
+    ui->alpha->setVisible(false);
+    ui->scale->setVisible(false);
+    ui->filter->setVisible(false);
+    ui->oxLabel->setVisible(false);
+    ui->oyLabel->setVisible(false);
+    ui->ozLabel->setVisible(false);
+    ui->pxLabel->setVisible(false);
+    ui->pyLabel->setVisible(false);
+    ui->pzLabel->setVisible(false);
+    ui->GoButton->setVisible(false);
+    ui->FrameEdit->setVisible(false);
+    ui->BackButton->setVisible(false);
+    ui->DemoButton->setVisible(false);
+    ui->DisplayBox->setVisible(false);
+    ui->FrameLabel->setVisible(false);
+    ui->ScanIntervalLabel->setVisible(false);
+    ui->PlayButton->setVisible(false);
+    ui->PlaySlider->setVisible(false);
+    ui->SaveButton->setVisible(false);
+    ui->ScaleLabel->setVisible(false);
+    ui->alphaLabel->setVisible(false);
+    ui->filterLabel->setVisible(false);
+    ui->DisplayButton->setVisible(false);
+    ui->VideoModeButton->setVisible(false);
+    ui->ScanIntervalEdit->setVisible(false);
+  }
+  on_DemoButton_clicked();
 }
 
 void PCLViewer::timerEvent(QTimerEvent *event) {

@@ -52,7 +52,7 @@ void Frame::Visualize(const Eigen::Affine3f& trans, bool display_cropped) {
       point.r = qRed(rgb);
       point.g = qGreen(rgb);
       point.b = qBlue(rgb);
-      point.a = 255 * 0.5;
+      point.a = 255 * 0.6;
 
       Eigen::Vector3f transformed;
       pcl::transformPoint(Eigen::Vector3f(point.x, point.y, point.z), transformed, trans);
@@ -92,17 +92,17 @@ void Frame::Show() {
   for (int row = 0; row < scan.height(); ++row) {
     for (int col = 0; col < scan.width(); ++col) {
       QRgb rgb = scan.pixel(col, row);
-      if ((qRed(rgb) + qGreen(rgb) + qBlue(rgb)) < 140) { // 140, 10
+      if ((qRed(rgb) + qGreen(rgb) + qBlue(rgb)) < 30) { // 140, 10
         continue;
       }
       PointT point;
       point.x = col - half_w;
       point.y = row - half_h;
       point.z = 0.0f;
-      point.r = qRed(rgb);
-      point.g = qGreen(rgb);
-      point.b = qBlue(rgb);
-      point.a = 255 * 0.2;
+      point.r = 34;
+      point.g = 139;
+      point.b = 34;
+      point.a = 255 * 0.35; // 0.2
 
       Eigen::Vector3f transformed;
       pcl::transformPoint(Eigen::Vector3f(point.x, point.y, point.z), transformed, trans ? *trans : Eigen::Affine3f::Identity());
